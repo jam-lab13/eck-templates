@@ -1,0 +1,25 @@
+## Elastic ECK Deployment
+
+#Install Custom Definitions
+kubectl create -f https://download.elastic.co/downloads/eck/2.6.1/crds.yaml
+
+#Install ECK operator with RBAC rules
+kubectl apply -f https://download.elastic.co/downloads/eck/2.6.1/operator.yaml
+
+#You should now have an operator deployed in the elastic-system namespace
+
+cat <<EOF | kubectl apply -f -
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: quickstart
+spec:
+  version: 8.6.2
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false
+EOF
+
+# Setting node.store.allow_mmap: false has performance implications and should be tuned for production workloads as described in the Virtual memory section.
